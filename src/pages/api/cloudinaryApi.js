@@ -21,7 +21,7 @@ export default function OCR(request, response) {
 			.filter((entry) => typeof entry === 'string')
 			.join(' ');
 
-		fs.writeFile('image_texts/' + result.public_id + '.txt', extractedText, (err) => {
+		fs.writeFile('image_texts/' + result.public_id + '.txt', textAnnotations[0].description, (err) => {
 			if (err)
 				throw err;
 			console.log('File saved!');

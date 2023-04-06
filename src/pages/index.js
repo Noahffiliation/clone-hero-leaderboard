@@ -30,7 +30,11 @@ export default function Home() {
 			const { data } = await fetch("/api/cloudinaryApi", {
 				method: "POST",
 				body: imageSrc
-			}).then((response) => response.json());
+			}).then((response) => response.json())
+			.catch((error) => {
+				console.log(error);
+				setLoading(false);
+			});
 
 			console.log(data);
 			setExtractedText();
@@ -39,7 +43,21 @@ export default function Home() {
 			console.log(error);
 			setLoading(false);
 		}
-	};
+
+		try {
+			const { data } = await fetch("/api/parseUpload")
+				.then((response) => response.json())
+				.catch((error) => {
+					console.log(error);
+					setLoading(false);
+				});
+
+			console.log(data);
+		} catch (error) {
+			console.log(error);
+			setLoading(false);
+		}
+	}
 
 	return (
 		<>
@@ -84,63 +102,61 @@ export default function Home() {
 				</Table.Body>
 			</Table>
 
-			{/* <main className="p-5 w-full max-w-4xl mx-auto"> */}
-				<h1 className="text-center font-bold text-2xl">Upload Score</h1>
+			<h1 className="text-center font-bold text-2xl">Upload Score</h1>
 
-				<form
-					action="post"
-					onChange={handleOnChange}
-					onSubmit={handleOnSubmit}
-					className="mt-5 grid gap-5 md:grid-cols-5"
-				>
-					<div className="w-full h-72 col-span-5 md:col-span-2 flex">
-						{imageSrc ? (
-							<Image
-								src={imageSrc}
-								width={1920}
-								height={1080}
-								alt="uploaded image"
-								className="object-contain h-full w-full"
-							/>
-						) : (
-							<span className="self-center flex flex-col space-y-3 p-5">
-								<p className="italic">
-									Click on the button below to add an image
-								</p>
-							</span>
-						)}
-					</div>
-
-					<div className="w-full col-span-2 md:order-last relative">
-						<input
-							type="file"
-							name="file"
-							className="absolute z-10 w-32 h-12 opacity-0"
+			<form
+				action="post"
+				onChange={handleOnChange}
+				onSubmit={handleOnSubmit}
+				className="mt-5 grid gap-5 md:grid-cols-5"
+			>
+				<div className="w-full h-72 col-span-5 md:col-span-2 flex">
+					{imageSrc ? (
+						<Image
+							src={imageSrc}
+							width={1920}
+							height={1080}
+							alt="uploaded image"
+							className="object-contain h-full w-full"
 						/>
-					</div>
+					) : (
+						<span className="self-center flex flex-col space-y-3 p-5">
+							<p className="italic">
+								Click on the button below to add an image
+							</p>
+						</span>
+					)}
+				</div>
 
-					<div className="w-max col-span-3 justify-self-end md:justify-self-start md:order-last">
-						<button
-							type="submit"
-							className="bg-green-500 text-white rounded-lg shadow-md p-3"
-						>
-						{loading ? (
-							<span className="flex items-center space-x-2">
-								Detecting text...
-							</span>
-							) : (
-								<span>Detect text</span>
-							)}
-						</button>
-					</div>
+				<div className="w-full col-span-2 md:order-last relative">
+					<input
+						type="file"
+						name="file"
+						className="absolute z-10 w-32 h-12 opacity-0"
+					/>
+				</div>
 
-					<div className="w-full max-h-72 overflow-hidden col-span-5 md:col-span-3 border-2 border-green-500 font-semibold text-gray-500 rounded-lg">
-						<div className="overflow-y-scroll break-words w-full h-full p-5">
-							{extractedText}
-						</div>
+				<div className="w-max col-span-3 justify-self-end md:justify-self-start md:order-last">
+					<button
+						type="submit"
+						className="bg-green-500 text-white rounded-lg shadow-md p-3"
+					>
+					{loading ? (
+						<span className="flex items-center space-x-2">
+							Detecting text...
+						</span>
+						) : (
+							<span>Detect text</span>
+						)}
+					</button>
+				</div>
+
+				<div className="w-full max-h-72 overflow-hidden col-span-5 md:col-span-3 border-2 border-green-500 font-semibold text-gray-500 rounded-lg">
+					<div className="overflow-y-scroll break-words w-full h-full p-5">
+						{extractedText}
 					</div>
-				</form>
-			{/* </main> */}
+				</div>
+			</form>
 		</>
 	)
 }
