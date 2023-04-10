@@ -1,7 +1,6 @@
 import fs from 'fs';
 
-function readFiles() {
-	let scores = [];
+export default function parseUpload(req, res) {
 	fs.readdirSync('image_texts').forEach((file) => {
 		fs.readFile(`image_texts/${file}`, 'utf8', (err, data) => {
 			if (err) {
@@ -22,15 +21,14 @@ function readFiles() {
 				avg_multiplier: lines[lines.length-8],
 				overstrums: lines[lines.length-7]
 			};
-			
-			scores.push(scoresheet);
-			console.log(scores)
+
+			console.log(scoresheet)
+
+			fetch("/api/scores", {
+				method: "POST",
+				body: JSON.stringify(scoresheet),
+			});
 		});
 	});
-	return scores;
-}
-
-export default function parseUpload(req, res) {
-	const scores = readFiles();
-	return res.status(200).json({ data: scores });
+	return res.status(200);
 }

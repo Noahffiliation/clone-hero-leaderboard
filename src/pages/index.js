@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Table } from '@nextui-org/react'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -11,6 +11,74 @@ export default function Home() {
 	const [imageSrc, setImageSrc] = useState();
 	const [loading, setLoading] = useState(false);
 	const [extractedText, setExtractedText] = useState("");
+	const [loadingData, setLoadingData] = useState(true);
+
+	const columns = useMemo(() => [
+		{
+			Header: 'Chart',
+			accessor: 'chart',
+		},
+		{
+			Header: 'Artist',
+			accessor: 'artist',
+		},
+		{
+			Header: 'Charter',
+			accessor: 'charter',
+		},
+		{
+			Header: 'Score',
+			accessor: 'score',
+		},
+		{
+			Header: 'Percentage',
+			accessor: 'percentage',
+		},
+		{
+			Header: 'Total Notes',
+			accessor: 'total_notes',
+		},
+		{
+			Header: 'Notes Hit',
+			accessor: 'notes_hit',
+		},
+		{
+			Header: 'Notes Missed',
+			accessor: 'notes_missed',
+		},
+		{
+			Header: 'Best Streak',
+			accessor: 'best_streak',
+		},
+		{
+			Header: 'Average Multiplier',
+			accessor: 'avg_multiplier',
+		},
+		{
+			Header: 'Overstrums',
+			accessor: 'overstrums',
+		},
+	]);
+
+	const [data, setData] = useState([]);
+
+	useEffect(() => {
+		async function getData() {
+			await fetch("/api/scores", {
+				method: "GET",
+			}).then((response) => {
+				console.log(response.data);
+				setData(response.data);
+				setLoadingData(false);
+			}).catch((error) => {
+				console.log(error);
+				setLoadingData(false);
+			});
+		}
+		if (loadingData) {
+			getData();
+		}
+	}, []);
 
 	const handleOnChange = (changeEvent) => {
 		const reader = new FileReader();
@@ -72,7 +140,34 @@ export default function Home() {
 					Clone Hero Leaderboard
 				</span>
 			</h1>
-			<Table
+
+			{loadingData ? (
+				<p>Loading Please wait...</p>
+			): (
+				<Table columns={columns} data={data} />
+				// <Table
+				// 	aria-label="Example table with dynamic content"
+				// 	css={{
+				// 		height: "auto",
+				// 		minWidth: "100%",
+				// 	}}
+				// 	>
+				// 	<Table.Header columns={columns}>
+				// 		{(column) => (
+				// 			<Table.Column key={column.accessor}>{column.Header}</Table.Column>
+				// 		)}
+				// 	</Table.Header>
+				// 	<Table.Body items={data}>
+				// 		{(item) => (
+				// 			<Table.Row key={item.key}>
+				// 				{(columnKey) => <Table.Cell>{item[columnKey]}</Table.Cell>}
+				// 			</Table.Row>
+				// 		)}
+				// 	</Table.Body>
+				// </Table>
+			)}
+
+			{/* <Table
 				bordered
 				shadow={false}
 				aria-label="Example table with static content"
@@ -100,7 +195,7 @@ export default function Home() {
 						<Table.Cell>1,132</Table.Cell>
 					</Table.Row>
 				</Table.Body>
-			</Table>
+			</Table> */}
 
 			<h1 className="text-center font-bold text-2xl">Upload Score</h1>
 
