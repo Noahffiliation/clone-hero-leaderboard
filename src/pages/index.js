@@ -2,83 +2,15 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Table } from '@nextui-org/react'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+export default function Home({ allScores }) {
 	const [imageSrc, setImageSrc] = useState();
 	const [loading, setLoading] = useState(false);
 	const [extractedText, setExtractedText] = useState("");
-	const [loadingData, setLoadingData] = useState(true);
-
-	const columns = useMemo(() => [
-		{
-			Header: 'Chart',
-			accessor: 'chart',
-		},
-		{
-			Header: 'Artist',
-			accessor: 'artist',
-		},
-		{
-			Header: 'Charter',
-			accessor: 'charter',
-		},
-		{
-			Header: 'Score',
-			accessor: 'score',
-		},
-		{
-			Header: 'Percentage',
-			accessor: 'percentage',
-		},
-		{
-			Header: 'Total Notes',
-			accessor: 'total_notes',
-		},
-		{
-			Header: 'Notes Hit',
-			accessor: 'notes_hit',
-		},
-		{
-			Header: 'Notes Missed',
-			accessor: 'notes_missed',
-		},
-		{
-			Header: 'Best Streak',
-			accessor: 'best_streak',
-		},
-		{
-			Header: 'Average Multiplier',
-			accessor: 'avg_multiplier',
-		},
-		{
-			Header: 'Overstrums',
-			accessor: 'overstrums',
-		},
-	]);
-
-	const [data, setData] = useState([]);
-
-	useEffect(() => {
-		async function getData() {
-			await fetch("/api/scores", {
-				method: "GET",
-			}).then((response) => {
-				console.log(response.data);
-				setData(response.data);
-				setLoadingData(false);
-			}).catch((error) => {
-				console.log(error);
-				setLoadingData(false);
-			});
-		}
-		if (loadingData) {
-			getData();
-		}
-	}, []);
 
 	const handleOnChange = (changeEvent) => {
 		const reader = new FileReader();
@@ -112,19 +44,19 @@ export default function Home() {
 			setLoading(false);
 		}
 
-		try {
-			const { data } = await fetch("/api/parseUpload")
-				.then((response) => response.json())
-				.catch((error) => {
-					console.log(error);
-					setLoading(false);
-				});
+		// try {
+		// 	const { data } = await fetch("/api/parseUpload")
+		// 		.then((response) => response.json())
+		// 		.catch((error) => {
+		// 			console.log(error);
+		// 			setLoading(false);
+		// 		});
 
-			console.log(data);
-		} catch (error) {
-			console.log(error);
-			setLoading(false);
-		}
+		// 	console.log(data);
+		// } catch (error) {
+		// 	console.log(error);
+		// 	setLoading(false);
+		// }
 	}
 
 	return (
@@ -141,33 +73,7 @@ export default function Home() {
 				</span>
 			</h1>
 
-			{loadingData ? (
-				<p>Loading Please wait...</p>
-			): (
-				<Table columns={columns} data={data} />
-				// <Table
-				// 	aria-label="Example table with dynamic content"
-				// 	css={{
-				// 		height: "auto",
-				// 		minWidth: "100%",
-				// 	}}
-				// 	>
-				// 	<Table.Header columns={columns}>
-				// 		{(column) => (
-				// 			<Table.Column key={column.accessor}>{column.Header}</Table.Column>
-				// 		)}
-				// 	</Table.Header>
-				// 	<Table.Body items={data}>
-				// 		{(item) => (
-				// 			<Table.Row key={item.key}>
-				// 				{(columnKey) => <Table.Cell>{item[columnKey]}</Table.Cell>}
-				// 			</Table.Row>
-				// 		)}
-				// 	</Table.Body>
-				// </Table>
-			)}
-
-			{/* <Table
+			<Table
 				bordered
 				shadow={false}
 				aria-label="Example table with static content"
@@ -176,26 +82,38 @@ export default function Home() {
 					minWidth: "100%",
 				}}
 				selectionMode="single"
-				>
+			>
 				<Table.Header>
-					<Table.Column>CHART</Table.Column>
-					<Table.Column>ARTIST</Table.Column>
-					<Table.Column>CHARTER</Table.Column>
-					<Table.Column>SCORE</Table.Column>
-					<Table.Column>NOTES HIT</Table.Column>
-					<Table.Column>TOTAL NOTES</Table.Column>
+					<Table.Column>Chart</Table.Column>
+					<Table.Column>Artist</Table.Column>
+					<Table.Column>Charter</Table.Column>
+					<Table.Column>Score</Table.Column>
+					<Table.Column>Percentage</Table.Column>
+					<Table.Column>Total Notes</Table.Column>
+					<Table.Column>Notes Hit</Table.Column>
+					<Table.Column>Notes Missed</Table.Column>
+					<Table.Column>Best Streak</Table.Column>
+					<Table.Column>Average Multiplier</Table.Column>
+					<Table.Column>Overstrums</Table.Column>
 				</Table.Header>
 				<Table.Body>
-					<Table.Row key="1">
-						<Table.Cell>A Cruel Angel&apos;s Thesis</Table.Cell>
-						<Table.Cell>331Erock</Table.Cell>
-						<Table.Cell>Teffy</Table.Cell>
-						<Table.Cell>229,407</Table.Cell>
-						<Table.Cell>1,028</Table.Cell>
-						<Table.Cell>1,132</Table.Cell>
-					</Table.Row>
+					{allScores.data.map((item) => (
+						<Table.Row key={item.key}>
+							<Table.Cell>{item.chart}</Table.Cell>
+							<Table.Cell>{item.artist}</Table.Cell>
+							<Table.Cell>{item.charter}</Table.Cell>
+							<Table.Cell>{item.score}</Table.Cell>
+							<Table.Cell>{item.percentage}</Table.Cell>
+							<Table.Cell>{item.total_notes}</Table.Cell>
+							<Table.Cell>{item.notes_hit}</Table.Cell>
+							<Table.Cell>{item.notes_missed}</Table.Cell>
+							<Table.Cell>{item.best_streak}</Table.Cell>
+							<Table.Cell>{item.avg_multiplier}</Table.Cell>
+							<Table.Cell>{item.overstrums}</Table.Cell>
+						</Table.Row>
+					))}
 				</Table.Body>
-			</Table> */}
+			</Table>
 
 			<h1 className="text-center font-bold text-2xl">Upload Score</h1>
 
@@ -254,4 +172,18 @@ export default function Home() {
 			</form>
 		</>
 	)
+}
+
+export async function getServerSideProps() {
+	let res = await fetch('http://localhost:3000/api/scores', {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+	});
+	let allScores = await res.json();
+
+	return {
+		props: { allScores },
+	};
 }

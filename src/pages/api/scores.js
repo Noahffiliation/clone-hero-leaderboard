@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 		case 'POST': {
 			let bodyObject = JSON.parse(req.body);
 			let myScore = await db.collection('scores').insertOne(bodyObject);
-			res.json(myScore.ops[0]);
+			res.json(myScore);
 			break;
 		}
 		case 'GET': {
@@ -16,19 +16,4 @@ export default async function handler(req, res) {
 			break;
 		}
 	}
-
-}
-
-export async function getServerSideProps(context) {
-	let res = await fetch('/api/scores', {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-	});
-	let allScores = await res.json();
-
-	return {
-		props: { allScores },
-	};
 }

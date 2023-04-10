@@ -22,9 +22,9 @@ export default function parseUpload(req, res) {
 				overstrums: lines[lines.length-7]
 			};
 
-			console.log(scoresheet)
+			console.log(scoresheet);
 
-			fetch("/api/scores", {
+			fetch("http://localhost:3000//api/scores", {
 				method: "POST",
 				body: JSON.stringify(scoresheet),
 			});
