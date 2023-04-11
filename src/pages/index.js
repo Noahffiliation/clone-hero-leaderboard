@@ -101,7 +101,7 @@ export default function Home({ allScores }) {
 				</Table.Body>
 			</Table>
 
-			<br></br>
+			<br />
 
 			<h2 className="text-center font-bold text-2xl">Upload Score</h2>
 
@@ -137,17 +137,21 @@ export default function Home({ allScores }) {
 					/>
 				</div>
 
+				<br />
+
 				<div className="w-max col-span-3 justify-self-end md:justify-self-start md:order-last">
 					<button
 						type="submit"
 						className="bg-green-500 text-white rounded-lg shadow-md p-3"
 					>
-					{loading ? (
-						<span className="flex items-center space-x-2">
-							Detecting text...
-						</span>
+						{loading ? (
+							<span className="flex items-center space-x-2">
+								Detecting text...
+							</span>
 						) : (
-							<span>Detect text</span>
+							<span className="flex items-center space-x-2">
+								Detect text
+							</span>
 						)}
 					</button>
 				</div>
