@@ -43,20 +43,6 @@ export default function Home({ allScores }) {
 			console.log(error);
 			setLoading(false);
 		}
-
-		// try {
-		// 	const { data } = await fetch("/api/parseUpload")
-		// 		.then((response) => response.json())
-		// 		.catch((error) => {
-		// 			console.log(error);
-		// 			setLoading(false);
-		// 		});
-
-		// 	console.log(data);
-		// } catch (error) {
-		// 	console.log(error);
-		// 	setLoading(false);
-		// }
 	}
 
 	return (
@@ -84,21 +70,21 @@ export default function Home({ allScores }) {
 				selectionMode="single"
 			>
 				<Table.Header>
-					<Table.Column>Chart</Table.Column>
-					<Table.Column>Artist</Table.Column>
-					<Table.Column>Charter</Table.Column>
-					<Table.Column>Score</Table.Column>
-					<Table.Column>Percentage</Table.Column>
-					<Table.Column>Total Notes</Table.Column>
-					<Table.Column>Notes Hit</Table.Column>
-					<Table.Column>Notes Missed</Table.Column>
-					<Table.Column>Best Streak</Table.Column>
-					<Table.Column>Average Multiplier</Table.Column>
-					<Table.Column>Overstrums</Table.Column>
+					<Table.Column key="chart">Chart</Table.Column>
+					<Table.Column key="artist">Artist</Table.Column>
+					<Table.Column key="charter">Charter</Table.Column>
+					<Table.Column key="score">Score</Table.Column>
+					<Table.Column key="percentage">Percentage</Table.Column>
+					<Table.Column key="total_notes">Total Notes</Table.Column>
+					<Table.Column key="notes_hit">Notes Hit</Table.Column>
+					<Table.Column key="notes_missed">Notes Missed</Table.Column>
+					<Table.Column key="best_streak">Best Streak</Table.Column>
+					<Table.Column key="average_multiplier">Average Multiplier</Table.Column>
+					<Table.Column key="overstrums">Overstrums</Table.Column>
 				</Table.Header>
 				<Table.Body>
 					{allScores.data.map((item) => (
-						<Table.Row key={item.key}>
+						<Table.Row key={item._id}>
 							<Table.Cell>{item.chart}</Table.Cell>
 							<Table.Cell>{item.artist}</Table.Cell>
 							<Table.Cell>{item.charter}</Table.Cell>
@@ -115,7 +101,9 @@ export default function Home({ allScores }) {
 				</Table.Body>
 			</Table>
 
-			<h1 className="text-center font-bold text-2xl">Upload Score</h1>
+			<br></br>
+
+			<h2 className="text-center font-bold text-2xl">Upload Score</h2>
 
 			<form
 				action="post"
@@ -135,7 +123,7 @@ export default function Home({ allScores }) {
 					) : (
 						<span className="self-center flex flex-col space-y-3 p-5">
 							<p className="italic">
-								Click on the button below to add an image
+								Click on the button below to upload a score
 							</p>
 						</span>
 					)}
