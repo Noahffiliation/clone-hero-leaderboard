@@ -1,7 +1,5 @@
 <h1 align="center">Clone Hero Leaderboard</h1>
 
-<p align="center"> Personal leaderboard for scores in Clone Hero</p>
-
 ## Table of Contents
 - [About](#about)
 - [Installation and Usage](#install_and_usage)
