@@ -167,7 +167,7 @@ export default function Home({ allScores }) {
 }
 
 export async function getServerSideProps() {
-	let res = await fetch('http://localhost:3000/api/scores', {
+	let res = await fetch(process.env.BASE_URL + '/api/scores', {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
