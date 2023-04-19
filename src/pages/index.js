@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import React, { useState } from 'react'
 import { Table } from '@nextui-org/react'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -81,6 +82,8 @@ export default function Home({ allScores }) {
 					<Table.Column key="best_streak">Best Streak</Table.Column>
 					<Table.Column key="average_multiplier">Average Multiplier</Table.Column>
 					<Table.Column key="overstrums">Overstrums</Table.Column>
+					<Table.Column key="view"></Table.Column>
+					<Table.Column key="edit"></Table.Column>
 				</Table.Header>
 				<Table.Body>
 					{allScores.data.map((item) => (
@@ -96,6 +99,8 @@ export default function Home({ allScores }) {
 							<Table.Cell>{item.best_streak}</Table.Cell>
 							<Table.Cell>{item.avg_multiplier}</Table.Cell>
 							<Table.Cell>{item.overstrums}</Table.Cell>
+							<Table.Cell><Link href={`/scores/${item._id}`}>View</Link></Table.Cell>
+							<Table.Cell><Link href={`/scores/${item._id}/edit`}>Edit</Link></Table.Cell>
 						</Table.Row>
 					))}
 				</Table.Body>
