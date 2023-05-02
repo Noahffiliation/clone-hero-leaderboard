@@ -2,6 +2,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { Inter } from 'next/font/google'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 // import Image from 'next/image'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -74,6 +75,9 @@ export default function Score({ allScores }) {
 			</h3>
 
 			{/* <Image src={???} alt={allScores.data.find((score) => score._id === score_id).chart} width={300} height={300} /> */}
+
+			<Link href={`/scores/${allScores.data.find((score) => score._id === score_id)._id}/edit`}>Edit</Link>
+			<Link href={`/`}>Back</Link>
 		</>
 	)
 }

@@ -1,4 +1,5 @@
 import clientPromise from '../../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
 	const client = await clientPromise;
@@ -13,6 +14,12 @@ export default async function handler(req, res) {
 		case 'GET': {
 			const allScores = await db.collection('scores').find().toArray();
 			res.json({ status: 200, data: allScores });
+			break;
+		}
+		case 'PUT': {
+			let bodyObject = JSON.parse(req.body);
+			let newScore = await db.collection('scores').updateOne({ _id: new ObjectId(bodyObject._id) }, { $set: bodyObject });
+			res.json(newScore);
 			break;
 		}
 	}
