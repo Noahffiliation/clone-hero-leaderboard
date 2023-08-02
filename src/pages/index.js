@@ -1,9 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import React, { useState } from 'react'
-import { Table } from '@nextui-org/react'
+import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from '@nextui-org/react'
 import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -54,56 +53,54 @@ export default function Home({ allScores }) {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<h1 className={styles.title}>
+			<h1>
 				<span style={{ fontFamily: inter.style.fontFamily }}>
 					Clone Hero Leaderboard
 				</span>
 			</h1>
 
 			<Table
-				bordered
-				shadow={false}
+				radius='lg'
+				shadow='none'
 				aria-label="Example table with static content"
-				css={{
-					height: "auto",
-					minWidth: "100%",
-				}}
 				selectionMode="single"
+				removeWrapper
+				isHeaderSticky
 			>
-				<Table.Header>
-					<Table.Column key="chart">Chart</Table.Column>
-					<Table.Column key="artist">Artist</Table.Column>
-					<Table.Column key="charter">Charter</Table.Column>
-					<Table.Column key="score">Score</Table.Column>
-					<Table.Column key="percentage">Percentage</Table.Column>
-					<Table.Column key="total_notes">Total Notes</Table.Column>
-					<Table.Column key="notes_hit">Notes Hit</Table.Column>
-					<Table.Column key="notes_missed">Notes Missed</Table.Column>
-					<Table.Column key="best_streak">Best Streak</Table.Column>
-					<Table.Column key="average_multiplier">Average Multiplier</Table.Column>
-					<Table.Column key="overstrums">Overstrums</Table.Column>
-					<Table.Column key="view"></Table.Column>
-					<Table.Column key="edit"></Table.Column>
-				</Table.Header>
-				<Table.Body>
+				<TableHeader>
+					<TableColumn key="chart">Chart</TableColumn>
+					<TableColumn key="artist">Artist</TableColumn>
+					<TableColumn key="charter">Charter</TableColumn>
+					<TableColumn key="score">Score</TableColumn>
+					<TableColumn key="percentage">Percentage</TableColumn>
+					<TableColumn key="total_notes">Total Notes</TableColumn>
+					<TableColumn key="notes_hit">Notes Hit</TableColumn>
+					<TableColumn key="notes_missed">Notes Missed</TableColumn>
+					<TableColumn key="best_streak">Best Streak</TableColumn>
+					<TableColumn key="average_multiplier">Average Multiplier</TableColumn>
+					<TableColumn key="overstrums">Overstrums</TableColumn>
+					<TableColumn key="view"></TableColumn>
+					<TableColumn key="edit"></TableColumn>
+				</TableHeader>
+				<TableBody emptyContent={"No scores to display."}>
 					{allScores.data.map((item) => (
-						<Table.Row key={item._id}>
-							<Table.Cell>{item.chart}</Table.Cell>
-							<Table.Cell>{item.artist}</Table.Cell>
-							<Table.Cell>{item.charter}</Table.Cell>
-							<Table.Cell>{item.score}</Table.Cell>
-							<Table.Cell>{item.percentage}</Table.Cell>
-							<Table.Cell>{item.total_notes}</Table.Cell>
-							<Table.Cell>{item.notes_hit}</Table.Cell>
-							<Table.Cell>{item.notes_missed}</Table.Cell>
-							<Table.Cell>{item.best_streak}</Table.Cell>
-							<Table.Cell>{item.avg_multiplier}</Table.Cell>
-							<Table.Cell>{item.overstrums}</Table.Cell>
-							<Table.Cell><Link href={`/scores/${item._id}`}>View</Link></Table.Cell>
-							<Table.Cell><Link href={`/scores/${item._id}/edit`}>Edit</Link></Table.Cell>
-						</Table.Row>
+						<TableRow key={item._id}>
+							<TableCell>{item.chart}</TableCell>
+							<TableCell>{item.artist}</TableCell>
+							<TableCell>{item.charter}</TableCell>
+							<TableCell>{item.score}</TableCell>
+							<TableCell>{item.percentage}</TableCell>
+							<TableCell>{item.total_notes}</TableCell>
+							<TableCell>{item.notes_hit}</TableCell>
+							<TableCell>{item.notes_missed}</TableCell>
+							<TableCell>{item.best_streak}</TableCell>
+							<TableCell>{item.avg_multiplier}</TableCell>
+							<TableCell>{item.overstrums}</TableCell>
+							<TableCell><Link href={`/scores/${item._id}`}>View</Link></TableCell>
+							<TableCell><Link href={`/scores/${item._id}/edit`}>Edit</Link></TableCell>
+						</TableRow>
 					))}
-				</Table.Body>
+				</TableBody>
 			</Table>
 
 			<br />
