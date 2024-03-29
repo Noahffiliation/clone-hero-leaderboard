@@ -13,7 +13,7 @@
     "cloudinary": "^2.0.3",
     "eslint": "8.57.0",
     "eslint-config-next": "14.1.4",
-    "framer-motion": "^11.0.22",
+    "framer-motion": "^11.0.23",
     "mongodb": "^6.5.0",
     "next": "14.1.4",
     "next-themes": "^0.3.0",
