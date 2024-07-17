@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.2",
-    "cloudinary": "^2.2.0",
+    "cloudinary": "^2.3.0",
     "eslint": "9.7.0",
     "framer-motion": "^11.3.4",
     "mongodb": "^6.8.0",
