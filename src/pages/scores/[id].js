@@ -82,6 +82,10 @@ export default function Score({ allScores }) {
 	)
 }
 
+Score.propTypes = {
+	allScores: PropTypes.object.isRequired,
+};
+
 export async function getServerSideProps() {
 	let res = await fetch(process.env.BASE_URL + '/api/scores', {
 		method: 'GET',

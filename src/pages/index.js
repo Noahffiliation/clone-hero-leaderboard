@@ -168,6 +168,10 @@ export default function Home({ allScores }) {
 	)
 }
 
+Home.propTypes = {
+	allScores: PropTypes.object.isRequired,
+}
+
 export async function getServerSideProps() {
 	let res = await fetch(process.env.BASE_URL + '/api/scores', {
 		method: 'GET',
