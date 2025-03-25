@@ -11,7 +11,7 @@
   "dependencies": {
     "@nextui-org/react": "^2.6.11",
     "cloudinary": "^2.6.0",
-    "eslint": "9.22.0",
+    "eslint": "9.23.0",
     "eslint-config-next": "^15.2.3",
     "framer-motion": "^12.5.0",
     "mongodb": "^6.15.0",
