@@ -16,7 +16,7 @@ export default function OCR(request, response) {
 		const { textAnnotations } = result.info.ocr.adv_ocr.data[0];
 
 		const extractedText = textAnnotations
-			.map((anno, i) => i > 0 && anno.description.replace(/[^0-9a-z]/gi, ''))
+			.map((anno, i) => i > 0 && anno.description.replaceAll(/[^0-9a-z]/gi, ''))
 			.filter((entry) => typeof entry === 'string')
 			.join(' ');
 
@@ -27,13 +27,13 @@ export default function OCR(request, response) {
 			artist: lines[1],
 			charter: lines[2],
 			score: lines[5],
-			percentage: lines[lines.length-14],
-			total_notes: lines[lines.length-12],
-			notes_hit: lines[lines.length-11],
-			notes_missed: lines[lines.length-10],
-			best_streak: lines[lines.length-9],
-			avg_multiplier: lines[lines.length-8],
-			overstrums: lines[lines.length-7]
+			percentage: lines.at(-14),
+			total_notes: lines.at(-12),
+			notes_hit: lines.at(-11),
+			notes_missed: lines.at(-10),
+			best_streak: lines.at(-9),
+			avg_multiplier: lines.at(-8),
+			overstrums: lines.at(-7)
 		};
 
 		fetch("http://localhost:3000//api/scores", {
