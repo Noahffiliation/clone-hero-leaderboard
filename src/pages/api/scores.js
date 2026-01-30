@@ -18,7 +18,29 @@ export default async function handler(req, res) {
 		}
 		case 'PUT': {
 			let bodyObject = JSON.parse(req.body);
-			let newScore = await db.collection('scores').updateOne({ _id: new ObjectId(bodyObject._id) }, { $set: bodyObject });
+			const { _id, ...updateFields } = bodyObject;
+
+			if (!_id) {
+				res.status(400).json({ error: 'Missing _id' });
+				break;
+			}
+
+			const safeUpdateFields = {};
+			Object.keys(updateFields).forEach((key) => {
+				if (!key.startsWith('$') && !key.includes('.')) {
+					safeUpdateFields[key] = updateFields[key];
+				}
+			});
+
+			if (Object.keys(safeUpdateFields).length === 0) {
+				res.status(400).json({ error: 'No valid fields to update' });
+				break;
+			}
+
+			let newScore = await db.collection('scores').updateOne(
+				{ _id: new ObjectId(_id) },
+				{ $set: safeUpdateFields }
+			);
 			res.json(newScore);
 			break;
 		}
