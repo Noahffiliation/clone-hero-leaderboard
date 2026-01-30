@@ -25,9 +25,15 @@ export default async function handler(req, res) {
 				break;
 			}
 
-			const safeUpdateFields = {};
+			const safeUpdateFields = Object.create(null);
+			const forbiddenKeys = new Set(['__proto__', 'constructor', 'prototype']);
+
 			Object.keys(updateFields).forEach((key) => {
-				if (!key.startsWith('$') && !key.includes('.')) {
+				if (
+					!key.startsWith('$') &&
+					!key.includes('.') &&
+					!forbiddenKeys.has(key)
+				) {
 					safeUpdateFields[key] = updateFields[key];
 				}
 			});
