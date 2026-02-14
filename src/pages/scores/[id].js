@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 // import Image from 'next/image'
+import PropTypes from 'prop-types'
 
 const inter = Inter({ subsets: ['latin'] })
 

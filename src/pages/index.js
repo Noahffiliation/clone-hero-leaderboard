@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import React, { useState } from 'react'
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from '@nextui-org/react'
 import Link from 'next/link'
+import PropTypes from 'prop-types'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,10 +32,10 @@ export default function Home({ allScores }) {
 				method: "POST",
 				body: imageSrc
 			}).then((response) => response.json())
-			.catch((error) => {
-				console.log(error);
-				setLoading(false);
-			});
+				.catch((error) => {
+					console.log(error);
+					setLoading(false);
+				});
 
 			console.log(data);
 			setExtractedText();
