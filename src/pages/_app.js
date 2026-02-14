@@ -1,14 +1,15 @@
 import { NextUIProvider } from '@nextui-org/react'
-import {ThemeProvider as NextThemesProvider} from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import PropTypes from 'prop-types';
 
 function App({ Component, pageProps }) {
-  return (
-	<NextUIProvider>
-		<NextThemesProvider attribute="class" defaultTheme="dark">
-			<Component {...pageProps} />
-		</NextThemesProvider>
-	</NextUIProvider>
-  )
+	return (
+		<NextUIProvider>
+			<NextThemesProvider attribute="class" defaultTheme="dark">
+				<Component {...pageProps} />
+			</NextThemesProvider>
+		</NextUIProvider>
+	)
 }
 
 App.propTypes = {
