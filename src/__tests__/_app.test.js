@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from '../pages/_app';
@@ -32,7 +33,7 @@ describe('App', () => {
         expect(themeProvider).toBeInTheDocument();
 
         // Check props passed to ThemeProvider
-        const props = JSON.parse(themeProvider.getAttribute('data-props'));
+        const props = JSON.parse(themeProvider.dataset.props);
         expect(props.attribute).toBe('class');
         expect(props.defaultTheme).toBe('dark');
     });

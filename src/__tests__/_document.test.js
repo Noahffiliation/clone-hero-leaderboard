@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types */
 import MyDocument from '../pages/_document';
-import Document from 'next/document';
 
 jest.mock('next/document', () => {
     const originalModule = jest.requireActual('next/document');
@@ -15,7 +15,7 @@ jest.mock('next/document', () => {
                 };
             }
         },
-        Html: ({ children }) => <html>{children}</html>,
+        Html: ({ children }) => <html lang="en">{children}</html>,
         Head: ({ children }) => <head>{children}</head>,
         Main: () => <main>Main</main>,
         NextScript: () => <script>NextScript</script>,

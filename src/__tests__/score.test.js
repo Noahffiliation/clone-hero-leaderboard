@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Score from '@/pages/scores/[id]';

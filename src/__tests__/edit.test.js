@@ -1,6 +1,6 @@
-
+/* eslint-disable react/prop-types */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Score, { getServerSideProps } from '../pages/scores/[id]/edit';
 import { useRouter } from 'next/router';
 
@@ -11,10 +11,10 @@ jest.mock('next/router', () => ({
 }));
 
 // Mock global fetch
-global.fetch = jest.fn();
+globalThis.fetch = jest.fn();
 
 // Mock console.log to avoid clutter
-global.console.log = jest.fn();
+globalThis.console.log = jest.fn();
 
 // Mock next/link
 jest.mock('next/link', () => {
