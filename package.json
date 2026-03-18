@@ -32,7 +32,7 @@
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "node-mocks-http": "^1.17.2",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.2"
   },
   "overrides": {
     "test-exclude": "^7.0.1"
