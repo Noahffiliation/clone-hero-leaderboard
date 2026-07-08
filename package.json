@@ -30,7 +30,7 @@
     "autoprefixer": "^10.5.2",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "node-mocks-http": "^1.17.2",
+    "node-mocks-http": "^1.18.0",
     "tailwindcss": "^4.3.2"
   },
   "overrides": {
