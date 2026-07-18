@@ -31,7 +31,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "node-mocks-http": "^1.18.0",
-    "tailwindcss": "^4.3.2"
+    "tailwindcss": "^4.3.3"
   },
   "overrides": {
     "@babel/core": "^7.29.6",
