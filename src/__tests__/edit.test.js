@@ -1,6 +1,5 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Score, { getServerSideProps } from '../pages/scores/[id]/edit';
 import { useRouter } from 'next/router';
 
@@ -13,9 +12,6 @@ jest.mock('next/router', () => ({
 // Mock global fetch
 globalThis.fetch = jest.fn();
 
-// Mock console.log to avoid clutter
-globalThis.console.log = jest.fn();
-
 // Mock next/link
 jest.mock('next/link', () => {
     return ({ children, href }) => {
@@ -23,12 +19,7 @@ jest.mock('next/link', () => {
     };
 });
 
-// Mock HTMLFormElement.prototype.requestSubmit
-beforeAll(() => {
-    HTMLFormElement.prototype.requestSubmit = jest.fn();
-});
-
-describe('Score', () => {
+describe('Score Edit Page', () => {
     const mockAllScores = {
         data: [
             {
@@ -48,11 +39,14 @@ describe('Score', () => {
         ]
     };
 
+    let pushMock;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        pushMock = jest.fn();
         useRouter.mockImplementation(() => ({
             asPath: '/scores/123/edit',
-            push: jest.fn(),
+            push: pushMock,
             query: { id: '123' },
         }));
     });
@@ -65,22 +59,67 @@ describe('Score', () => {
         expect(screen.getByDisplayValue('Test Artist')).toBeInTheDocument();
     });
 
-    it('submits the form data', async () => {
+    it('renders the form with empty defaults when score has missing fields', () => {
+        render(<Score allScores={{ data: [{ _id: '123' }] }} />);
+        expect(screen.getByText('Edit Score')).toBeInTheDocument();
+    });
+
+    it('renders the form with default values when router query is empty', () => {
+        useRouter.mockImplementation(() => ({
+            asPath: '/scores/123/edit',
+            push: pushMock,
+            query: {},
+        }));
+        render(<Score allScores={mockAllScores} />);
+        expect(screen.getByDisplayValue('Test Chart')).toBeInTheDocument();
+    });
+
+    it('renders fallback title when score is not found', () => {
+        useRouter.mockImplementation(() => ({}));
+        render(<Score allScores={{ data: [] }} />);
+        expect(screen.getByText('Edit Score')).toBeInTheDocument();
+    });
+
+    it('submits the form data and redirects', async () => {
         render(<Score allScores={mockAllScores} />);
 
-        // Simulate user changing values (optional, but good for testing)
         const chartInput = screen.getByDisplayValue('Test Chart');
-        fireEvent.change(chartInput, { target: { value: 'Updated Chart' } });
+        fireEvent.change(chartInput, { target: { name: 'chart', value: 'Updated Chart' } });
 
-        // Click submit
-        const submitButton = screen.getByText('Submit');
+        const submitButton = screen.getByRole('button', { name: /Submit/i });
         fireEvent.click(submitButton);
 
-        // Verify fetch call
-        expect(fetch).toHaveBeenCalledWith('http://localhost:3000/api/scores', expect.objectContaining({
-            method: "PUT",
-            body: expect.stringContaining('"chart":"Updated Chart"'),
+        await waitFor(() => {
+            expect(fetch).toHaveBeenCalledWith('/api/scores', expect.objectContaining({
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: expect.stringContaining('"chart":"Updated Chart"'),
+            }));
+            expect(pushMock).toHaveBeenCalledWith('/scores/123');
+        });
+    });
+
+    it('submits the form data and redirects using score_id fallback when score not found', async () => {
+        useRouter.mockImplementation(() => ({
+            asPath: '/scores/456/edit',
+            push: pushMock,
+            query: { id: '456' },
         }));
+
+        render(<Score allScores={{ data: [] }} />);
+
+        const submitButton = screen.getByRole('button', { name: /Submit/i });
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(fetch).toHaveBeenCalledWith('/api/scores', expect.objectContaining({
+                method: 'PUT',
+                body: expect.stringContaining('"_id":"456"'),
+            }));
+            expect(pushMock).toHaveBeenCalledWith('/scores/456');
+        });
     });
 });
 

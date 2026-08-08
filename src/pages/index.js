@@ -28,7 +28,7 @@ export default function Home({ allScores }) {
 		setLoading(true);
 
 		try {
-			const { data } = await fetch("/api/cloudinaryApi", {
+			const res = await fetch("/api/cloudinaryApi", {
 				method: "POST",
 				body: imageSrc
 			}).then((response) => response.json())
@@ -37,8 +37,10 @@ export default function Home({ allScores }) {
 					setLoading(false);
 				});
 
-			console.log(data);
-			setExtractedText();
+			if (res?.data) {
+				console.log(res.data);
+				setExtractedText(res.data);
+			}
 			setLoading(false);
 		} catch (error) {
 			console.log(error);
@@ -132,11 +134,18 @@ export default function Home({ allScores }) {
 					)}
 				</div>
 
-				<div className="w-full col-span-2 md:order-last relative">
+				<div className="w-full col-span-2 md:order-last flex flex-col justify-center">
+					<label
+						htmlFor="file-upload"
+						className="cursor-pointer inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors text-center w-max"
+					>
+						Choose Score Image
+					</label>
 					<input
+						id="file-upload"
 						type="file"
 						name="file"
-						className="absolute z-10 w-32 h-12 opacity-0"
+						className="hidden"
 					/>
 				</div>
 
@@ -173,16 +182,4 @@ Home.propTypes = {
 	allScores: PropTypes.object.isRequired,
 }
 
-export async function getServerSideProps() {
-	let res = await fetch(process.env.BASE_URL + '/api/scores', {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-	});
-	let allScores = await res.json();
-
-	return {
-		props: { allScores },
-	};
-}
+export { getScoresServerSideProps as getServerSideProps } from '../../lib/getScoresProps';

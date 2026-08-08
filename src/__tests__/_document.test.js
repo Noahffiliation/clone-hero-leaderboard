@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import MyDocument from '../pages/_document';
 
 jest.mock('next/document', () => {
@@ -7,7 +7,7 @@ jest.mock('next/document', () => {
         __esModule: true,
         ...originalModule,
         default: class MockDocument {
-            static async getInitialProps(ctx) {
+            static async getInitialProps() {
                 return {
                     html: '<html></html>',
                     head: [],
@@ -15,10 +15,10 @@ jest.mock('next/document', () => {
                 };
             }
         },
-        Html: ({ children }) => <html lang="en">{children}</html>,
-        Head: ({ children }) => <head>{children}</head>,
-        Main: () => <main>Main</main>,
-        NextScript: () => <script>NextScript</script>,
+        Html: ({ children }) => <>{children}</>,
+        Head: ({ children }) => <>{children}</>,
+        Main: () => <div data-testid="main-content">Main</div>,
+        NextScript: () => <div data-testid="next-script">NextScript</div>,
     };
 });
 
@@ -31,5 +31,14 @@ describe('MyDocument', () => {
         expect(initialProps).toHaveProperty('head');
         expect(initialProps).toHaveProperty('styles');
         expect(Array.isArray(initialProps.styles)).toBe(true);
+    });
+
+    it('renders document elements correctly', () => {
+        const doc = new MyDocument();
+        const tree = doc.render();
+
+        expect(tree).toBeDefined();
+        expect(tree.type).toBeDefined();
+        expect(tree.props.lang).toBe('en');
     });
 });

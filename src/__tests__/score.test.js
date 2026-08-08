@@ -1,7 +1,7 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Score from '@/pages/scores/[id]';
+import Score, { getServerSideProps } from '@/pages/scores/[id]';
+import { useRouter } from 'next/router';
 import '@testing-library/jest-dom';
 
 // Mock dependencies
@@ -19,10 +19,11 @@ jest.mock('next/head', () => {
 });
 
 jest.mock('next/router', () => ({
-    useRouter: () => ({
-        asPath: '/scores/1',
-    }),
+    useRouter: jest.fn(),
 }));
+
+// Mock global fetch
+globalThis.fetch = jest.fn();
 
 const mockScores = {
     data: [
@@ -58,13 +59,56 @@ const mockScores = {
 };
 
 describe('Score Detail Page', () => {
-    it('renders score details correctly', () => {
+    beforeEach(() => {
+        useRouter.mockReturnValue({
+            asPath: '/scores/1',
+            query: { id: '1' },
+        });
+    });
+
+    it('renders score details correctly with query id', () => {
         render(<Score allScores={mockScores} />);
 
         expect(screen.getByText('Test Chart')).toBeInTheDocument();
         expect(screen.getByText('Artist: Test Artist')).toBeInTheDocument();
         expect(screen.getByText('Score: 100000')).toBeInTheDocument();
+        expect(screen.getByText('Charter: Test Charter')).toBeInTheDocument();
+        expect(screen.getByText('Percentage: 100%')).toBeInTheDocument();
+        expect(screen.getByText('Total Notes: 1000')).toBeInTheDocument();
+        expect(screen.getByText('Notes Hit: 1000')).toBeInTheDocument();
+        expect(screen.getByText('Notes Missed: 0')).toBeInTheDocument();
+        expect(screen.getByText('Best Streak: 1000')).toBeInTheDocument();
+        expect(screen.getByText('Average Multiplier: 4')).toBeInTheDocument();
+        expect(screen.getByText('Overstrums: 0')).toBeInTheDocument();
     });
 
-    // Add more assertions for other fields if needed
+    it('renders score details correctly when router.query is empty', () => {
+        useRouter.mockReturnValue({
+            asPath: '/scores/1',
+            query: {},
+        });
+        render(<Score allScores={mockScores} />);
+        expect(screen.getByText('Test Chart')).toBeInTheDocument();
+    });
+
+    it('renders fallback when score is not found', () => {
+        useRouter.mockReturnValue({});
+        render(<Score allScores={{ data: [] }} />);
+
+        expect(screen.getByText('Score Not Found')).toBeInTheDocument();
+        expect(screen.getByText('Back')).toBeInTheDocument();
+    });
+
+    it('fetches server side props correctly', async () => {
+        process.env.BASE_URL = 'http://localhost:3000';
+        fetch.mockResolvedValueOnce({
+            json: jest.fn().mockResolvedValueOnce(mockScores),
+        });
+
+        const result = await getServerSideProps();
+
+        expect(result).toEqual({
+            props: { allScores: mockScores },
+        });
+    });
 });

@@ -1,7 +1,6 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Home from '@/pages/index';
+import Home, { getServerSideProps } from '@/pages/index';
 import '@testing-library/jest-dom';
 
 // Mock dependencies
@@ -19,8 +18,8 @@ jest.mock('next/head', () => {
 });
 
 jest.mock('next/link', () => {
-    return ({ children }) => {
-        return <a href="/mock">{children}</a>;
+    return ({ children, href }) => {
+        return <a href={href || "/mock"}>{children}</a>;
     };
 });
 
@@ -30,8 +29,9 @@ jest.mock('next/image', () => {
     };
 });
 
-// Mock fetch
+// Mock fetch and console.log
 globalThis.fetch = jest.fn();
+globalThis.console.log = jest.fn();
 
 const mockScores = {
     data: [
@@ -54,7 +54,7 @@ const mockScores = {
 
 describe('Home Page', () => {
     beforeEach(() => {
-        fetch.mockClear();
+        jest.clearAllMocks();
     });
 
     it('renders the leaderboard correctly', () => {
@@ -70,7 +70,6 @@ describe('Home Page', () => {
 
         const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
 
-        // Mock FileReader
         const fileReaderMock = {
             readAsDataURL: jest.fn(),
             onload: null,
@@ -79,55 +78,31 @@ describe('Home Page', () => {
 
         globalThis.FileReader = jest.fn(() => fileReaderMock);
 
-        // Trigger file selection (This might be tricky as the input interacts with HandleOnChange)
-        // The input has no label or clear way to select, checking by type="file" might help if I could specific select it
-        // The input has name="file".
-        // Let's use getByRole or querySelector
-        // The file input is inside a div, it has name="file"
-        const input = document.querySelector('input[name="file"]');
-
-        // Simulate user selecting a file
-        // Note: The component uses onChange on the form, bubbling up from the input?
-        // The form has onChange={handleOnChange}
-        // So changing the input should trigger the form onChange
-
-        // We need to trigger the change event on the input.
-        // However, since handleOnChange relies on FileReader, we need to mock the event properly.
-
-        // Let's simulate the FileReader behavior manually if needed or rely on the mock.
-        // When readAsDataURL is called, we should trigger onload.
-
-        fileReaderMock.readAsDataURL.mockImplementation((blob) => {
+        fileReaderMock.readAsDataURL.mockImplementation(() => {
             fileReaderMock.result = 'data:image/png;base64,mocked';
             if (fileReaderMock.onload) {
                 fileReaderMock.onload({ target: { result: fileReaderMock.result } });
             }
         });
 
+        const input = document.querySelector('input[name="file"]');
         fireEvent.change(input, { target: { files: [file] } });
 
-        // Expect image to appear
         await waitFor(() => {
             expect(screen.getByAltText('uploaded image')).toBeInTheDocument();
         });
     });
 
-    it('handles form submission', async () => {
+    it('handles successful form submission', async () => {
         render(<Home allScores={mockScores} />);
 
-        // Mock fetch response
         fetch.mockResolvedValueOnce({
             json: async () => ({ data: 'Extracted Text Result' }),
         });
 
-        // We need to set the image first to enable the button logic if any (button is always there but text changes)
-        // Actually the button text changes based on loading state.
-
         const submitButton = screen.getByRole('button', { name: /Detect/i });
-
         fireEvent.submit(submitButton.closest('form'));
 
-        // Loading state check might be fast, but let's check if fetch was called
         await waitFor(() => {
             expect(fetch).toHaveBeenCalledWith('/api/cloudinaryApi', expect.objectContaining({
                 method: 'POST',
@@ -135,4 +110,48 @@ describe('Home Page', () => {
         });
     });
 
+    it('handles json parse failure in handleOnSubmit catch chain', async () => {
+        render(<Home allScores={mockScores} />);
+
+        fetch.mockResolvedValueOnce({
+            json: async () => {
+                throw new Error('Invalid JSON');
+            },
+        });
+
+        const submitButton = screen.getByRole('button', { name: /Detect/i });
+        fireEvent.submit(submitButton.closest('form'));
+
+        await waitFor(() => {
+            expect(globalThis.console.log).toHaveBeenCalledWith(expect.any(Error));
+        });
+    });
+
+    it('handles fetch network failure in handleOnSubmit try/catch', async () => {
+        render(<Home allScores={mockScores} />);
+
+        fetch.mockImplementationOnce(() => {
+            throw new Error('Network error');
+        });
+
+        const submitButton = screen.getByRole('button', { name: /Detect/i });
+        fireEvent.submit(submitButton.closest('form'));
+
+        await waitFor(() => {
+            expect(globalThis.console.log).toHaveBeenCalledWith(expect.any(Error));
+        });
+    });
+
+    it('fetches server side props correctly', async () => {
+        process.env.BASE_URL = 'http://localhost:3000';
+        fetch.mockResolvedValueOnce({
+            json: jest.fn().mockResolvedValueOnce(mockScores),
+        });
+
+        const result = await getServerSideProps();
+
+        expect(result).toEqual({
+            props: { allScores: mockScores },
+        });
+    });
 });

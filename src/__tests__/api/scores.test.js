@@ -5,7 +5,10 @@ import clientPromise from '../../../lib/mongodb';
 // Mock mongodb
 jest.mock('mongodb', () => {
     return {
-        ObjectId: jest.fn((id) => id || 'mock-id'),
+        ObjectId: jest.fn((id) => {
+            if (id === 'invalid-id') throw new Error('Invalid ObjectId');
+            return id || 'mock-id';
+        }),
     };
 });
 
@@ -33,7 +36,6 @@ describe('/api/scores', () => {
             method: 'GET',
         });
 
-        // Setup mock return
         const client = await clientPromise;
         const db = client.db();
         const collection = db.collection();
@@ -48,7 +50,7 @@ describe('/api/scores', () => {
         });
     });
 
-    it('POST inserts data', async () => {
+    it('POST inserts data when body is JSON string', async () => {
         const { req, res } = createMocks({
             method: 'POST',
             body: JSON.stringify({ chart: 'New Chart' }),
@@ -66,10 +68,51 @@ describe('/api/scores', () => {
         expect(collection.insertOne).toHaveBeenCalledWith(expect.objectContaining({ chart: 'New Chart' }));
     });
 
-    it('POST returns 400 for invalid body', async () => {
+    it('POST inserts data when body is already an object', async () => {
         const { req, res } = createMocks({
             method: 'POST',
-            body: JSON.stringify({ 'constructor': 'evil' }), // Sanitize should remove this, leaving empty object
+            body: { chart: 'New Chart Object' },
+        });
+
+        const client = await clientPromise;
+        const db = client.db();
+        const collection = db.collection();
+        collection.insertOne.mockResolvedValueOnce({ insertedId: '456' });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(200);
+        expect(JSON.parse(res._getData())).toEqual({ insertedId: '456' });
+    });
+
+    it('POST returns 400 for empty or invalid body', async () => {
+        const { req, res } = createMocks({
+            method: 'POST',
+            body: 'invalid-json-content',
+        });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toEqual({ error: 'No valid fields provided' });
+    });
+
+    it('POST returns 400 when body is null literal', async () => {
+        const { req, res } = createMocks({
+            method: 'POST',
+            body: 'null',
+        });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toEqual({ error: 'No valid fields provided' });
+    });
+
+    it('POST returns 400 when all keys are forbidden or dotted', async () => {
+        const { req, res } = createMocks({
+            method: 'POST',
+            body: JSON.stringify({ constructor: 'evil', $gt: '', 'nested.dot': 'val' }),
         });
 
         await handler(req, res);
@@ -77,7 +120,7 @@ describe('/api/scores', () => {
         expect(res._getStatusCode()).toBe(400);
     });
 
-    it('PUT updates data', async () => {
+    it('PUT updates data successfully', async () => {
         const { req, res } = createMocks({
             method: 'PUT',
             body: JSON.stringify({ _id: '123', chart: 'Updated Chart' }),
@@ -102,16 +145,41 @@ describe('/api/scores', () => {
         await handler(req, res);
 
         expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toEqual({ error: 'Missing _id' });
     });
 
-    it('PUT returns 400 for invalid body', async () => {
+    it('PUT returns 400 if _id has invalid format', async () => {
         const { req, res } = createMocks({
             method: 'PUT',
-            body: JSON.stringify({ _id: '123', 'constructor': 'evil' }),
+            body: JSON.stringify({ _id: 'invalid-id', chart: 'Updated Chart' }),
         });
 
         await handler(req, res);
 
         expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toEqual({ error: 'Invalid _id format' });
+    });
+
+    it('PUT returns 400 for invalid body with no valid update fields', async () => {
+        const { req, res } = createMocks({
+            method: 'PUT',
+            body: JSON.stringify({ _id: '123', constructor: 'evil' }),
+        });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toEqual({ error: 'No valid fields to update' });
+    });
+
+    it('returns 405 Method Not Allowed for unsupported methods', async () => {
+        const { req, res } = createMocks({
+            method: 'DELETE',
+        });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(405);
+        expect(res.getHeader('Allow')).toEqual(['GET', 'POST', 'PUT']);
     });
 });
