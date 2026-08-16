@@ -4,18 +4,39 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      prefix: "deps:"
+    labels:
+      - "dependencies"
+      - "javascript"
     groups:
-      dependencies:
+      npm-dependencies:
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "docker:"
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      prefix: "ci:"
+    labels:
+      - "dependencies"
+      - "ci/cd"
     groups:
       github-actions:
         patterns:

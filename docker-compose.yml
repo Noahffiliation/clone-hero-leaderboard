@@ -1,0 +1,9 @@
+services:
+  clone-hero-leaderboard:
+    build: .
+    container_name: clone-hero-leaderboard
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env
